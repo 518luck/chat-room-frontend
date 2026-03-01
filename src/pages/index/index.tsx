@@ -21,7 +21,9 @@ export function Index() {
   return (
     <div id="index-container">
       <div className="header">
-        <h1>聊天室</h1>
+        <Link to={"/"}>
+          <h1>聊天室</h1>
+        </Link>
         <Link to={"/update_info"}>
           {headPic ? (
             <img src={headPic} width={40} height={40} className="icon" />

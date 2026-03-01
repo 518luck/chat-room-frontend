@@ -105,3 +105,8 @@ export async function updateUserInfoCaptcha(email: string) {
 export async function presignedUrl(fileName: string) {
   return axiosInstance.get(`/minio/presignedUrl?name=${fileName}`);
 }
+
+// 获取用户好友关系
+export async function friendshipList(name?: string) {
+  return axiosInstance.get(`/friendship/list?name=${name || ""}`);
+}

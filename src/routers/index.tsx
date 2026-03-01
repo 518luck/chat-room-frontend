@@ -1,5 +1,11 @@
+import { Chat } from "@/pages/Chat";
+import { Collection } from "@/pages/Collection";
+import { Friendship } from "@/pages/Friendship";
+import { Group } from "@/pages/Group";
 import { Index } from "@/pages/index";
 import { Login } from "@/pages/Login";
+import { Menu } from "@/pages/Menu";
+import { Notification } from "@/pages/Notification";
 import { Register } from "@/pages/Register";
 import { UpdateInfo } from "@/pages/UpdateInfo";
 import { UpdatePassword } from "@/pages/UpdatePassword";
@@ -15,8 +21,30 @@ const routes = [
         element: <UpdateInfo />,
       },
       {
-        path: "bbb",
-        element: <div>bbb</div>,
+        path: "/",
+        element: <Menu />,
+        children: [
+          {
+            path: "/",
+            element: <Friendship />,
+          },
+          {
+            path: "/group",
+            element: <Group />,
+          },
+          {
+            path: "chat",
+            element: <Chat />,
+          },
+          {
+            path: "collection",
+            element: <Collection />,
+          },
+          {
+            path: "notification",
+            element: <Notification />,
+          },
+        ],
       },
     ],
   },
