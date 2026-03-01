@@ -32,13 +32,13 @@ export function Login() {
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("userInfo", JSON.stringify(res.data.user));
       }
+      setTimeout(() => {
+        navigate("/");
+      }, 100);
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
         const errorMsg = e.response?.data?.message || "登录失败，请重试";
         message.error(errorMsg);
-        setTimeout(() => {
-          navigate("/");
-        }, 100);
       } else {
         // 处理非网络请求错误
         message.error("系统繁忙，请稍后再试");
