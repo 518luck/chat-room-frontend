@@ -1,10 +1,10 @@
 import { Button, Form, Input, message } from "antd";
 import { useForm } from "antd/es/form/Form";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import "./index.css";
-import { useNavigate } from "react-router-dom";
 import { getUserInfo, updateInfo, updateUserInfoCaptcha } from "@/interfaces";
 import axios from "axios";
+import { HeadPicUpload } from "@/pages/UpdateInfo/HeadPicUpload";
 
 export interface UserInfo {
   headPic: string;
@@ -20,7 +20,6 @@ const layout1 = {
 
 export function UpdateInfo() {
   const [form] = useForm();
-  const navigate = useNavigate();
 
   // 初始化表单数据 (用户信息)
   useEffect(() => {
@@ -45,6 +44,15 @@ export function UpdateInfo() {
       const res = await updateInfo(values);
       if (res.status === 201 || res.status === 200) {
         message.success("用户信息更新成功");
+        const userInfo = localStorage.getItem("userInfo");
+
+        if (userInfo) {
+          const info = JSON.parse(userInfo);
+          info.headPic = values.headPic;
+          info.nickName = values.nickName;
+
+          localStorage.setItem("userInfo", JSON.stringify(info));
+        }
       }
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
@@ -94,7 +102,7 @@ export function UpdateInfo() {
           name="headPic"
           rules={[{ required: true, message: "请输入头像!" }]}
         >
-          <Input />
+          <HeadPicUpload />
         </Form.Item>
 
         <Form.Item

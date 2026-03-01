@@ -100,3 +100,8 @@ export async function updateUserInfoCaptcha(email: string) {
     },
   });
 }
+
+// 获取预签名上传 URL
+export async function presignedUrl(fileName: string) {
+  return axiosInstance.get(`/minio/presignedUrl?name=${fileName}`);
+}
