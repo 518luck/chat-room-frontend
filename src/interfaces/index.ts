@@ -110,3 +110,8 @@ export async function presignedUrl(fileName: string) {
 export async function friendshipList(name?: string) {
   return axiosInstance.get(`/friendship/list?name=${name || ""}`);
 }
+
+// 查看所有群聊
+export async function chatroomList(name: string) {
+  return axiosInstance.get(`/chatroom/list?name=${name}`);
+}

@@ -1,5 +1,5 @@
-import { Badge, Button, Form, Input, Popconfirm, Table, message } from "antd";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Button, Form, Input, Table, message } from "antd";
+import { useEffect, useMemo, useState } from "react";
 import "./index.css";
 import { useForm } from "antd/es/form/Form";
 import type { TableProps } from "antd";
@@ -44,6 +44,7 @@ export function Friendship() {
       },
       {
         title: "操作",
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         render: (_, record) => (
           <div>
             <a href="#">聊天</a>
@@ -70,7 +71,7 @@ export function Friendship() {
       }
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
-        const errorMsg = e.response?.data?.message || "登录失败，请重试";
+        const errorMsg = e.response?.data?.message || "查询好友失败，请重试";
         message.error(errorMsg);
       } else {
         // 处理非网络请求错误
