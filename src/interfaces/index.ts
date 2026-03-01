@@ -121,3 +121,18 @@ export async function chatroomList(name: string) {
 export async function friendAdd(data: AddFriend) {
   return axiosInstance.post("/friendship/add", data);
 }
+
+// 获取好友申请列表
+export async function friendRequestList() {
+  return axiosInstance.get("/friendship/request_list");
+}
+
+// 同意好友请求
+export async function agreeFriendRequest(id: number) {
+  return axiosInstance.get(`/friendship/agree/${id}`);
+}
+
+// 拒绝好友请求
+export async function rejectFriendRequest(id: number) {
+  return axiosInstance.get(`/friendship/reject/${id}`);
+}
