@@ -5,6 +5,7 @@ import { useForm } from "antd/es/form/Form";
 import type { TableProps } from "antd";
 import axios from "axios";
 import { friendshipList } from "@/interfaces";
+import { AddFriendModal } from "@/pages/Friendship/AddFriendModal";
 
 interface SearchFriend {
   name: string;
@@ -19,6 +20,7 @@ interface FriendshipSearchResult {
 }
 
 export function Friendship() {
+  const [isAddFriendModalOpen, setAddFriendModalOpen] = useState(false);
   const [friendshipResult, setFriendshipResult] = useState<
     Array<FriendshipSearchResult>
   >([]);
@@ -55,6 +57,7 @@ export function Friendship() {
     [],
   );
 
+  // 搜索好友
   const searchFriend = async (values: SearchFriend) => {
     try {
       const res = await friendshipList(values.name || "");
@@ -111,6 +114,16 @@ export function Friendship() {
               搜索
             </Button>
           </Form.Item>
+
+          <Form.Item label=" ">
+            <Button
+              type="primary"
+              style={{ background: "green" }}
+              onClick={() => setAddFriendModalOpen(true)}
+            >
+              添加好友
+            </Button>
+          </Form.Item>
         </Form>
       </div>
 
@@ -121,6 +134,12 @@ export function Friendship() {
           style={{ width: "1000px" }}
         />
       </div>
+      <AddFriendModal
+        isOpen={isAddFriendModalOpen}
+        handleClose={() => {
+          setAddFriendModalOpen(false);
+        }}
+      />
     </div>
   );
 }

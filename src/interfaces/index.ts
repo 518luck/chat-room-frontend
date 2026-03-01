@@ -1,3 +1,4 @@
+import type { AddFriend } from "@/pages/Friendship/AddFriendModal";
 import type { RegisterUser } from "@/pages/Register";
 import type { UserInfo } from "@/pages/UpdateInfo";
 import type { UpdatePassword } from "@/pages/UpdatePassword";
@@ -114,4 +115,9 @@ export async function friendshipList(name?: string) {
 // 查看所有群聊
 export async function chatroomList(name: string) {
   return axiosInstance.get(`/chatroom/list?name=${name}`);
+}
+
+// 添加好友
+export async function friendAdd(data: AddFriend) {
+  return axiosInstance.post("/friendship/add", data);
 }
