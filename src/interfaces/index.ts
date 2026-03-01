@@ -1,11 +1,50 @@
 import type { RegisterUser } from "@/pages/Register";
+import type { UserInfo } from "@/pages/UpdateInfo";
 import type { UpdatePassword } from "@/pages/UpdatePassword";
+import { message } from "antd";
 import axios from "axios";
 
+// 创建axios实例
 const axiosInstance = axios.create({
   baseURL: "http://localhost:3005/",
   timeout: 3005,
 });
+
+// 请求拦截器
+axiosInstance.interceptors.request.use(function (config) {
+  const accessToken = localStorage.getItem("token");
+
+  if (accessToken) {
+    config.headers.authorization = "Bearer " + accessToken;
+  }
+  return config;
+});
+
+// 响应拦截器
+axiosInstance.interceptors.response.use(
+  (response) => {
+    const newToken = response.headers["token"];
+    if (newToken) {
+      localStorage.setItem("token", newToken);
+    }
+    return response;
+  },
+  async (error) => {
+    if (!error.response) {
+      return Promise.reject(error);
+    }
+    const { data } = error.response;
+    if (data.statusCode === 401) {
+      message.error(data.message);
+
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 1500);
+    } else {
+      return Promise.reject(error);
+    }
+  },
+);
 
 // 登录
 export async function login(username: string, password: string) {
@@ -41,4 +80,23 @@ export async function updatePasswordCaptcha(email: string) {
 // 更新密码
 export async function updatePassword(data: UpdatePassword) {
   return await axiosInstance.post("/user/update_password", data);
+}
+
+// 查询用户详情
+export async function getUserInfo() {
+  return await axiosInstance.get("/user/info");
+}
+
+// 更新用户信息
+export async function updateInfo(data: UserInfo) {
+  return await axiosInstance.post("/user/update", data);
+}
+
+// 获取更新用户信息验证码
+export async function updateUserInfoCaptcha(email: string) {
+  return await axiosInstance.get("/user/update/captcha", {
+    params: {
+      address: email,
+    },
+  });
 }
