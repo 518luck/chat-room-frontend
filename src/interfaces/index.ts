@@ -160,3 +160,12 @@ export async function createOneToOne(friendId: number) {
     },
   });
 }
+
+// 获取群聊成员
+export async function groupMembers(chatroomId: number) {
+  return axiosInstance.get(`/chatroom/members`, {
+    params: {
+      chatroomId,
+    },
+  });
+}

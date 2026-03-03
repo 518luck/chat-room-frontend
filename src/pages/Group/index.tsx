@@ -4,6 +4,8 @@ import "./index.css";
 import { useForm } from "antd/es/form/Form";
 import { chatroomList } from "@/interfaces";
 import axios from "axios";
+import { MembersModal } from "./MembersModal";
+import { useNavigate } from "react-router-dom";
 
 interface SearchGroup {
   name: string;
@@ -12,11 +14,16 @@ interface SearchGroup {
 interface GroupSearchResult {
   id: number;
   name: string;
+  type: boolean;
+  userCount: number;
   createTime: Date;
 }
 
 export function Group() {
   const [groupResult, setGroupResult] = useState<Array<GroupSearchResult>>([]);
+  const [isMembersModalOpen, setMembersModalOpen] = useState(false);
+  const [chatroomId, setChatroomId] = useState<number>(-1);
+  const navigate = useNavigate();
 
   const columns: TableProps<GroupSearchResult>["columns"] = useMemo(
     () => [
@@ -25,25 +32,64 @@ export function Group() {
         dataIndex: "name",
       },
       {
+        title: "人数",
+        dataIndex: "userCount",
+      },
+      {
         title: "创建时间",
         dataIndex: "createTime",
       },
+
       {
         title: "操作",
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         render: (_, record) => (
           <div>
-            <a href="#">聊天</a>
+            <a
+              href=""
+              onClick={() => {
+                navigate("/chat", {
+                  state: {
+                    chatroomId: record.id,
+                  },
+                });
+              }}
+            >
+              聊天
+            </a>
+
+            <a
+              href="#"
+              onClick={() => {
+                setChatroomId(record.id);
+                setMembersModalOpen(true);
+              }}
+            >
+              详情
+            </a>
           </div>
         ),
       },
     ],
-    [],
+    [navigate],
   );
 
   const searchGroup = async (values: SearchGroup) => {
     try {
-      const res = await chatroomList(values.name || "");
+      const res = await chatroomList(values.name || ""); // 1. 调用接口获取所有房间
+
+      setGroupResult(
+        res.data
+          .filter((item: GroupSearchResult) => {
+            return item.type === true; // 2. 【核心】只保留类型为“群聊”的房间
+          })
+          .map((item: GroupSearchResult) => {
+            return {
+              ...item,
+              key: item.id, // 3. 为 AntD 表格增加必要的 key
+            };
+          }),
+      );
 
       if (res.status === 201 || res.status === 200) {
         setGroupResult(
@@ -105,6 +151,13 @@ export function Group() {
           style={{ width: "1000px" }}
         />
       </div>
+      <MembersModal
+        isOpen={isMembersModalOpen}
+        handleClose={() => {
+          setMembersModalOpen(false);
+        }}
+        chatroomId={chatroomId}
+      />
     </div>
   );
 }

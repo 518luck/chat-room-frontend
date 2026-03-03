@@ -30,6 +30,14 @@ export function Friendship() {
 
   const columns: TableProps<FriendshipSearchResult>["columns"] = [
     {
+      title: "ID",
+      dataIndex: "id",
+    },
+    {
+      title: "用户名",
+      dataIndex: "username",
+    },
+    {
       title: "昵称",
       dataIndex: "nickName",
     },
