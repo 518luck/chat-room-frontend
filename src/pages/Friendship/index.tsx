@@ -1,11 +1,13 @@
 import { Button, Form, Input, Table, message } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import "./index.css";
 import { useForm } from "antd/es/form/Form";
 import type { TableProps } from "antd";
 import axios from "axios";
-import { friendshipList } from "@/interfaces";
+import { createOneToOne, findChatroom, friendshipList } from "@/interfaces";
 import { AddFriendModal } from "@/pages/Friendship/AddFriendModal";
+import { getUserInfo } from "@/utils";
+import { useNavigate } from "react-router-dom";
 
 interface SearchFriend {
   name: string;
@@ -20,42 +22,78 @@ interface FriendshipSearchResult {
 }
 
 export function Friendship() {
+  const navigate = useNavigate();
   const [isAddFriendModalOpen, setAddFriendModalOpen] = useState(false);
   const [friendshipResult, setFriendshipResult] = useState<
     Array<FriendshipSearchResult>
   >([]);
 
-  const columns: TableProps<FriendshipSearchResult>["columns"] = useMemo(
-    () => [
-      {
-        title: "昵称",
-        dataIndex: "nickName",
-      },
-      {
-        title: "头像",
-        dataIndex: "headPic",
-        render: (_, record) => (
-          <div>
-            <img src={record.headPic} />
-          </div>
-        ),
-      },
-      {
-        title: "邮箱",
-        dataIndex: "email",
-      },
-      {
-        title: "操作",
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        render: (_, record) => (
-          <div>
-            <a href="#">聊天</a>
-          </div>
-        ),
-      },
-    ],
-    [],
-  );
+  const columns: TableProps<FriendshipSearchResult>["columns"] = [
+    {
+      title: "昵称",
+      dataIndex: "nickName",
+    },
+    {
+      title: "头像",
+      dataIndex: "headPic",
+      render: (_, record) => (
+        <div>
+          <img src={record.headPic} />
+        </div>
+      ),
+    },
+    {
+      title: "邮箱",
+      dataIndex: "email",
+    },
+    {
+      title: "操作",
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      render: (_, record) => (
+        <div>
+          <a
+            href="#"
+            onClick={() => {
+              goToChat(record.id);
+            }}
+          >
+            聊天
+          </a>
+        </div>
+      ),
+    },
+  ];
+
+  async function goToChat(friendId: number) {
+    const userId = getUserInfo().id;
+    try {
+      const res = await findChatroom(userId, friendId);
+
+      if (res.data) {
+        navigate("/chat", {
+          state: {
+            chatroomId: res.data,
+          },
+        });
+      } else {
+        const res2 = await createOneToOne(friendId);
+        navigate("/chat", {
+          state: {
+            chatroomId: res2.data,
+          },
+        });
+      }
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        const errorMsg =
+          e.response?.data?.message || "创建聊天房间失败，请重试";
+        message.error(errorMsg);
+      } else {
+        // 处理非网络请求错误
+        message.error("系统繁忙，请稍后再试");
+      }
+    }
+  }
 
   // 搜索好友
   const searchFriend = async (values: SearchFriend) => {

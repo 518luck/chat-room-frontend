@@ -5,7 +5,8 @@ import "./index.scss";
 import type { UserInfo } from "@/pages/UpdateInfo";
 import axios from "axios";
 import { chatHistoryList, chatroomList } from "@/interfaces";
-import type { User } from "@/pages/Notification";
+import { getUserInfo } from "@/utils";
+import { useLocation } from "react-router-dom";
 const { TextArea } = Input;
 
 interface JoinRoomPayload {
@@ -49,9 +50,6 @@ type Reply =
       type: "joinRoom";
       userId: number;
     };
-function getUserInfo(): User {
-  return JSON.parse(localStorage.getItem("userInfo")!);
-}
 
 export function Chat() {
   const [roomList, setRoomList] = useState<Array<Chatroom>>([]); // 群聊列表
@@ -59,6 +57,12 @@ export function Chat() {
   const [roomId, setChatRoomId] = useState<number>(0); // 当前群聊id
   const [inputText, setInputText] = useState("");
   const userInfo = getUserInfo();
+  const location = useLocation();
+
+  useEffect(() => {
+    const res = () => setChatRoomId(location.state?.chatroomId);
+    res();
+  }, [location.state?.chatroomId]);
 
   // 查询所有群聊
   async function queryChatroomList() {
@@ -197,7 +201,7 @@ export function Chat() {
         {roomList?.map((item) => {
           return (
             <div
-              className="chat-room-item"
+              className={`chat-room-item ${item.id === roomId ? "selected" : ""}`}
               data-id={item.id}
               key={item.id}
               onClick={() => {
