@@ -1,10 +1,9 @@
 import { Form, Input, Modal, message } from "antd";
 import { useForm } from "antd/es/form/Form";
-import { addMember } from "@/interfaces";
+import { createGroup } from "@/interfaces";
 import axios from "axios";
 
-interface AddMemberModalProps {
-  chatroomId: number;
+interface CreateGroupModalProps {
   isOpen: boolean;
   handleClose: () => void;
 }
@@ -14,12 +13,12 @@ const layout = {
   wrapperCol: { span: 18 },
 };
 
-export interface AddMember {
-  username: string;
+export interface GroupGroup {
+  name: string;
 }
 
-export function AddMemberModal(props: AddMemberModalProps) {
-  const [form] = useForm<AddMember>();
+export function CreateGroupModal(props: CreateGroupModalProps) {
+  const [form] = useForm<GroupGroup>();
 
   const handleOk = async function () {
     await form.validateFields();
@@ -27,16 +26,16 @@ export function AddMemberModal(props: AddMemberModalProps) {
     const values = form.getFieldsValue();
 
     try {
-      const res = await addMember(props.chatroomId, values.username);
+      const res = await createGroup(values.name);
 
       if (res.status === 201 || res.status === 200) {
-        message.success("成员添加成功");
+        message.success("群聊创建成功过");
         form.resetFields();
         props.handleClose();
       }
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
-        const errorMsg = e.response?.data?.message || "查询群聊失败，请重试";
+        const errorMsg = e.response?.data?.message || "查询好友失败，请重试";
         message.error(errorMsg);
       } else {
         // 处理非网络请求错误
@@ -47,18 +46,18 @@ export function AddMemberModal(props: AddMemberModalProps) {
 
   return (
     <Modal
-      title="添加成员"
+      title="创建群聊"
       open={props.isOpen}
       onOk={handleOk}
       onCancel={() => props.handleClose()}
-      okText={"添加"}
+      okText={"创建"}
       cancelText={"取消"}
     >
       <Form form={form} colon={false} {...layout}>
         <Form.Item
-          label="用户名"
-          name="username"
-          rules={[{ required: true, message: "请输入用户名!" }]}
+          label="群聊名称"
+          name="name"
+          rules={[{ required: true, message: "请输入群聊名称!" }]}
         >
           <Input />
         </Form.Item>

@@ -59,11 +59,6 @@ export function Chat() {
   const userInfo = getUserInfo();
   const location = useLocation();
 
-  useEffect(() => {
-    const res = () => setChatRoomId(location.state?.chatroomId);
-    res();
-  }, [location.state?.chatroomId]);
-
   // 查询所有群聊
   async function queryChatroomList() {
     try {
@@ -174,6 +169,16 @@ export function Chat() {
       socket.disconnect();
     };
   }, [roomId]);
+
+  useEffect(() => {
+    if (location.state?.chatroomId) {
+      const res = () => setChatRoomId(location.state?.chatroomId);
+
+      const res1 = () => queryChatHistoryList(location.state?.chatroomId);
+      res();
+      res1();
+    }
+  }, [location.state?.chatroomId]);
 
   // 发送消息
   async function sendMessage(value: string) {

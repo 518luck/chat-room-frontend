@@ -6,6 +6,8 @@ import { chatroomList } from "@/interfaces";
 import axios from "axios";
 import { MembersModal } from "./MembersModal";
 import { useNavigate } from "react-router-dom";
+import { AddMemberModal } from "./AddMemberModal";
+import { CreateGroupModal } from "./CreateGroupModal";
 
 interface SearchGroup {
   name: string;
@@ -23,6 +25,8 @@ export function Group() {
   const [groupResult, setGroupResult] = useState<Array<GroupSearchResult>>([]);
   const [isMembersModalOpen, setMembersModalOpen] = useState(false);
   const [chatroomId, setChatroomId] = useState<number>(-1);
+  const [isMemberAddModalOpen, setMemberAddModalOpen] = useState(false);
+  const [isCreateGroupModalOpen, setCreateGroupModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const columns: TableProps<GroupSearchResult>["columns"] = useMemo(
@@ -66,6 +70,15 @@ export function Group() {
               }}
             >
               详情
+            </a>
+            <a
+              href="#"
+              onClick={() => {
+                setChatroomId(record.id);
+                setMemberAddModalOpen(true);
+              }}
+            >
+              添加成员
             </a>
           </div>
         ),
@@ -121,7 +134,7 @@ export function Group() {
     };
     initData();
   }, [form]);
-
+  const [queryKey, setQueryKey] = useState("");
   return (
     <div id="group-container">
       <div className="group-form">
@@ -141,6 +154,16 @@ export function Group() {
               搜索
             </Button>
           </Form.Item>
+
+          <Form.Item label=" ">
+            <Button
+              type="primary"
+              style={{ background: "green" }}
+              onClick={() => setCreateGroupModalOpen(true)}
+            >
+              创建群聊
+            </Button>
+          </Form.Item>
         </Form>
       </div>
 
@@ -157,6 +180,25 @@ export function Group() {
           setMembersModalOpen(false);
         }}
         chatroomId={chatroomId}
+        queryKey={queryKey}
+      />
+      <AddMemberModal
+        isOpen={isMemberAddModalOpen}
+        handleClose={() => {
+          setMemberAddModalOpen(false);
+          setQueryKey(Math.random().toString().slice(2, 10));
+        }}
+        chatroomId={chatroomId}
+      />
+      <CreateGroupModal
+        isOpen={isCreateGroupModalOpen}
+        handleClose={() => {
+          setCreateGroupModalOpen(false);
+          setQueryKey(Math.random().toString().slice(2, 10));
+          searchGroup({
+            name: form.getFieldValue("name"),
+          });
+        }}
       />
     </div>
   );

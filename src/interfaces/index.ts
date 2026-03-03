@@ -169,3 +169,21 @@ export async function groupMembers(chatroomId: number) {
     },
   });
 }
+
+// 加入群聊
+export async function addMember(chatroomId: number, joinUsername: string) {
+  return axiosInstance.get(`/chatroom/join/${chatroomId}`, {
+    params: {
+      joinUsername,
+    },
+  });
+}
+
+// 创建群聊
+export async function createGroup(name: string) {
+  return axiosInstance.get(`/chatroom/create-group`, {
+    params: {
+      name,
+    },
+  });
+}

@@ -8,6 +8,7 @@ export interface MembersModalProps {
   isOpen: boolean;
   chatroomId: number;
   handleClose: () => void;
+  queryKey: string;
 }
 
 interface User {
@@ -22,6 +23,7 @@ export function MembersModal({
   isOpen,
   chatroomId,
   handleClose,
+  queryKey,
 }: MembersModalProps) {
   const [members, setMembers] = useState<Array<User>>();
 
@@ -58,7 +60,7 @@ export function MembersModal({
     const res = () => queryMembers();
     res();
     //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatroomId]);
+  }, [chatroomId, queryKey]);
 
   const columns: TableProps<User>["columns"] = [
     {
