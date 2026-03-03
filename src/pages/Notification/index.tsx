@@ -8,7 +8,7 @@ import {
 } from "@/interfaces";
 import axios from "axios";
 
-interface User {
+export interface User {
   id: number;
   headPic: string;
   nickName: string;

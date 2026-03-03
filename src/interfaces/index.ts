@@ -113,7 +113,7 @@ export async function friendshipList(name?: string) {
 }
 
 // 查看所有群聊
-export async function chatroomList(name: string) {
+export async function chatroomList(name?: string) {
   return axiosInstance.get(`/chatroom/list?name=${name}`);
 }
 
@@ -135,4 +135,9 @@ export async function agreeFriendRequest(id: number) {
 // 拒绝好友请求
 export async function rejectFriendRequest(id: number) {
   return axiosInstance.get(`/friendship/reject/${id}`);
+}
+
+// 获取群聊历史消息
+export async function chatHistoryList(id: number) {
+  return axiosInstance.get(`/chat-history/list?chatroomId=${id}`);
 }
