@@ -1,4 +1,4 @@
-import { Button, Input, message } from "antd";
+import { Button, Input, message, Popover } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import "./index.scss";
@@ -7,7 +7,22 @@ import axios from "axios";
 import { chatHistoryList, chatroomList } from "@/interfaces";
 import { getUserInfo } from "@/utils";
 import { useLocation } from "react-router-dom";
+import EmojiPicker from "@emoji-mart/react"; //(组件库/身体)：
+import data from "@emoji-mart/data"; //这是一个纯数据包，包含了所有表情符号的元数据（名称、别名、分类、不同版本的 Unicode 编码等）。
+import { UploadImageModal } from "./UploadImageModal";
+import { UploadModal } from "./UploadModal";
+
 const { TextArea } = Input;
+
+// 手动定义一个标准的 Emoji 对象类型
+interface EmojiObject {
+  id: string; // 唯一 ID，如 "heart"
+  name: string; // 名称，如 "Heavy Black Heart"
+  native: string; // 真正的表情符号，如 "❤️"
+  unified: string; // 标准 Unicode 编码
+  keywords: string[]; // 搜索关键词
+  shortcodes: string; // 短代码，如 ":heart:"
+}
 
 interface JoinRoomPayload {
   chatroomId: number;
@@ -26,7 +41,7 @@ interface SendMessagePayload {
 }
 
 interface Message {
-  type: "text" | "image";
+  type: "text" | "image" | "file";
   content: string;
 }
 
@@ -58,6 +73,8 @@ export function Chat() {
   const [inputText, setInputText] = useState("");
   const userInfo = getUserInfo();
   const location = useLocation();
+  const [isUploadImageModalOpen, setUploadImageModalOpen] = useState(false);
+  const [uploadType, setUploadType] = useState<"image" | "file">("image");
 
   // 查询所有群聊
   async function queryChatroomList() {
@@ -181,7 +198,7 @@ export function Chat() {
   }, [location.state?.chatroomId]);
 
   // 发送消息
-  async function sendMessage(value: string) {
+  async function sendMessage(value: string, type: Message["type"] = "text") {
     if (!value) {
       return;
     }
@@ -192,7 +209,7 @@ export function Chat() {
       sendUserId: getUserInfo().id,
       chatroomId: roomId,
       message: {
-        type: "text",
+        type: type,
         content: value,
       },
     };
@@ -233,7 +250,15 @@ export function Chat() {
                 <span className="sender-nickname">{item.sender.nickName}</span>
               </div>
 
-              <div className="message-content">{item.content}</div>
+              <div className="message-content">
+                {item.type === 0 ? (
+                  item.content
+                ) : item.type === 1 ? (
+                  <img src={item.content} alt="图片" width="100" height="100" />
+                ) : (
+                  <div> {item.content}</div>
+                )}
+              </div>
             </div>
           );
         })}
@@ -243,9 +268,44 @@ export function Chat() {
 
       <div className="message-input">
         <div className="message-type">
-          <div className="message-type-itme">表情</div>
-          <div className="message-type-itme">图片</div>
-          <div className="message-type-itme">文本</div>
+          <div className="message-type-itme" key={1}>
+            <Popover
+              content={
+                <EmojiPicker
+                  data={data} // 表情包的“数据库”。
+                  onEmojiSelect={(emoji: EmojiObject) => {
+                    console.log("🚀 ~ Chat ~ emoji:", emoji);
+                    //用户点击表情时的“回调函数”。
+                    setInputText((inputText) => inputText + emoji.native);
+                  }}
+                />
+              }
+              title="Title"
+              trigger="click"
+            >
+              表情
+            </Popover>
+          </div>
+          <div
+            className="message-type-itme"
+            key={2}
+            onClick={() => {
+              setUploadImageModalOpen(true);
+              setUploadType("image");
+            }}
+          >
+            图片
+          </div>
+          <div
+            className="message-type-itme"
+            key={3}
+            onClick={() => {
+              setUploadImageModalOpen(true);
+              setUploadType("file");
+            }}
+          >
+            文本
+          </div>
         </div>
 
         <div className="message-input-area">
@@ -268,6 +328,25 @@ export function Chat() {
           </Button>
         </div>
       </div>
+      <UploadImageModal
+        isOpen={isUploadImageModalOpen}
+        handleClose={(imgSrc) => {
+          setUploadImageModalOpen(false);
+          if (imgSrc) {
+            sendMessage(imgSrc, "image");
+          }
+        }}
+      />
+      <UploadModal
+        isOpen={isUploadImageModalOpen}
+        handleClose={(fileUrl) => {
+          setUploadImageModalOpen(false);
+          if (fileUrl) {
+            sendMessage(fileUrl, uploadType);
+          }
+        }}
+        type={uploadType}
+      />
     </div>
   );
 }
