@@ -187,3 +187,26 @@ export async function createGroup(name: string) {
     },
   });
 }
+
+// 获取用户的收藏列表
+export async function queryFavoriteList() {
+  return axiosInstance.get(`/favorite/list`);
+}
+
+// 添加收藏
+export async function favoriteAdd(chatHistoryId: number) {
+  return axiosInstance.get(`/favorite/add`, {
+    params: {
+      chatHistoryId,
+    },
+  });
+}
+
+// 删除收藏
+export async function favoriteDel(id: number) {
+  return axiosInstance.get(`/favorite/del`, {
+    params: {
+      id,
+    },
+  });
+}

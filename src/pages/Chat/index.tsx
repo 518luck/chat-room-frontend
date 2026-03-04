@@ -4,7 +4,7 @@ import { io, Socket } from "socket.io-client";
 import "./index.scss";
 import type { UserInfo } from "@/pages/UpdateInfo";
 import axios from "axios";
-import { chatHistoryList, chatroomList } from "@/interfaces";
+import { chatHistoryList, chatroomList, favoriteAdd } from "@/interfaces";
 import { getUserInfo } from "@/utils";
 import { useLocation } from "react-router-dom";
 import EmojiPicker from "@emoji-mart/react"; //(组件库/身体)：
@@ -217,6 +217,24 @@ export function Chat() {
     socketRef.current?.emit("sendMessage", payload2);
   }
 
+  async function addToFavorite(chatHistoryId: number) {
+    try {
+      const res = await favoriteAdd(chatHistoryId);
+
+      if (res.status === 201 || res.status === 200) {
+        message.success("收藏成功");
+      }
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        const errorMsg = e.response?.data?.message || "收藏失败，请重试";
+        message.error(errorMsg);
+      } else {
+        // 处理非网络请求错误
+        message.error("系统繁忙，请稍后再试");
+      }
+    }
+  }
+
   return (
     <div id="chat-container">
       <div className="chat-room-list">
@@ -244,6 +262,9 @@ export function Chat() {
               className={`message-item ${item.senderId === userInfo.id ? "from-me" : ""}`}
               data-id={item.id}
               key={item.id}
+              onDoubleClick={() => {
+                addToFavorite(item.id);
+              }}
             >
               <div className="message-sender">
                 <img src={item.sender.headPic} />
