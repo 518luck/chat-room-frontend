@@ -256,7 +256,9 @@ export function Chat() {
                 ) : item.type === 1 ? (
                   <img src={item.content} alt="图片" width="100" height="100" />
                 ) : (
-                  <div> {item.content}</div>
+                  <a download href={item.content}>
+                    {item.content}
+                  </a>
                 )}
               </div>
             </div>
